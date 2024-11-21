@@ -2,8 +2,11 @@ package com.example.cryptext.ui.screen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,16 +27,16 @@ import com.example.cryptext.ui.components.LoginHeader
 import com.example.cryptext.ui.theme.CrypTextTheme
 
 @Composable
-fun LoginPage(
-    modifier: Modifier = Modifier
-) {
+fun LoginPage() {
+    
     var email by remember { mutableStateOf("")}
     var senha by remember { mutableStateOf("")}
 
-
     Column (
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
+            .verticalScroll(rememberScrollState())
+
     ) {
         LoginHeader(
             modifier = Modifier

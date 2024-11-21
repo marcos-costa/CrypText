@@ -22,14 +22,10 @@ val SoraFontFamily = FontFamily(
     Font(googleFont = SoraFont, fontProvider = provider)
 )
 
-val ArmanaFontFamily = FontFamily(
-    Font(googleFont = SoraFont, fontProvider = provider)
-)
-
 val Typography = Typography(
     titleLarge = TextStyle(
         color = Color(0xFF4F4356),
-        fontFamily = ArmanaFontFamily,
+        fontFamily = SoraFontFamily,
         fontWeight = FontWeight.ExtraLight,
         fontSize = 50.sp,
         lineHeight = 24.sp,
@@ -46,23 +42,23 @@ val Typography = Typography(
     bodyLarge = TextStyle(
         fontFamily = SoraFontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
+        fontSize = 20.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.5.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = SoraFontFamily,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Light,
         fontSize = 16.sp,
-        lineHeight = 20.sp,
+        lineHeight = 22.sp,
         letterSpacing = 0.5.sp
     ),
     bodySmall = TextStyle(
-    fontFamily = SoraFontFamily,
-    fontWeight = FontWeight.Normal,
-    fontSize = 14.sp,
-    lineHeight = 20.sp,
-    letterSpacing = 0.5.sp
+        fontFamily = SoraFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.5.sp
     )
 
 )

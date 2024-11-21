@@ -2,6 +2,7 @@ package com.example.cryptext.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -23,6 +24,7 @@ fun InputText(
     label: String,
     placeHolderText: String,
     password: Boolean,
+    enabled: Boolean = true,
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -50,7 +52,9 @@ fun InputText(
                 )
             },
             visualTransformation = if (password) PasswordVisualTransformation() else VisualTransformation.None,
+            shape = RoundedCornerShape(30),
             singleLine = true,
+            enabled = enabled,
             value = value,
             onValueChange = onValueChange,
             textStyle = MaterialTheme.typography.bodyLarge,
