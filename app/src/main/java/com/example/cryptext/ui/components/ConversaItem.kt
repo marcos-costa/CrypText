@@ -2,6 +2,7 @@ package com.example.cryptext.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,19 +22,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.cryptext.R
 import com.example.cryptext.data.ui.Message
 import com.example.cryptext.ui.theme.CrypTextTheme
 
 @Composable
 fun ConversaItem(
+    onClick: () -> Unit,
     message: Message,
     modifier: Modifier = Modifier
 ) {
     Row (
         modifier = modifier
             .clip(CircleShape)
-            .background(Color(0xFFE5E9FF)),
+            .background(Color(0xFFE5E9FF))
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
@@ -84,6 +89,7 @@ fun ConversaItem(
 fun ConversaItemPreview() {
     CrypTextTheme {
         ConversaItem(
+            onClick = {},
             message = Message(
                 friendName = "Marcos",
                 message = "Olá bom lakjsdlçkjasçlkdjfçlaksjdfçlkajsdçlkfjaçlskdjflaksjdf",

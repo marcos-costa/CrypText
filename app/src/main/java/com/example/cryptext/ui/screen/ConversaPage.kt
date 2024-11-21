@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.cryptext.data.ui.Message
 import com.example.cryptext.data.ui.User
 import com.example.cryptext.ui.components.BottonConversaBar
@@ -18,9 +19,12 @@ import com.example.cryptext.ui.theme.CrypTextTheme
 
 @Composable
 fun ConversaPage(
-    user: User,
-    messages: List<Message>
+    navHostController: NavHostController,
+    username: String
 ) {
+    var user = User(name = "Marcos Costa", username = "@marcos", email = "@mail", status = "Online")
+    var messages = emptyList<Message>()
+
     Scaffold (
         topBar = {
             Column {
@@ -49,21 +53,7 @@ fun ConversaPage(
                 modifier = Modifier
                     .padding(paddingValues)
             )
-        }
-    )
-}
+        },
 
-@Preview(showBackground = true)
-@Composable
-fun ConversaPagePreview() {
-    CrypTextTheme {
-        ConversaPage(
-            user = User(
-                name = "Marcos",
-                username = "@marcos",
-                email = "marcos@mail.com"
-            ),
-            messages = emptyList()
-        )
-    }
+    )
 }

@@ -13,11 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.cryptext.data.ui.Message
 import com.example.cryptext.ui.theme.CrypTextTheme
 
 @Composable
 fun ConversaItemList(
+    navHostController: NavHostController,
     messages: List<Message>,
     modifier: Modifier = Modifier
 ) {
@@ -37,6 +39,7 @@ fun ConversaItemList(
         ) {
             items(messages) { message ->
                 ConversaItem(
+                    onClick = { navHostController.navigate("conversas/${message.friendName}" )},
                     message = message,
                     modifier = Modifier.padding(top = 10.dp)
                 )
@@ -45,48 +48,49 @@ fun ConversaItemList(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ConversaItemListPreview() {
-
-    val messages = listOf(
-        Message(
-            friendName = "Marcos",
-            message = "Olá bom dia",
-            date = "15/10",
-            hour = "17:34",
-            received = true
-        ),
-        Message(
-            friendName = "Marcos",
-            message = "Olá bom dia",
-            date = "15/10",
-            hour = "17:34",
-            received = true
-        ),
-        Message(
-            friendName = "Marcos",
-            message = "Olá bom dia",
-            date = "15/10",
-            hour = "17:34",
-            received = true
-        )
-    )
-    CrypTextTheme {
-        ConversaItemList(
-            messages = messages,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ConversaItemListEmptyPreview() {
-    CrypTextTheme {
-        ConversaItemList(
-            messages = emptyList(),
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ConversaItemListPreview() {
+//
+//    val messages = listOf(
+//        Message(
+//            friendName = "Marcos",
+//            message = "Olá bom dia",
+//            date = "15/10",
+//            hour = "17:34",
+//            received = true
+//        ),
+//        Message(
+//            friendName = "Marcos",
+//            message = "Olá bom dia",
+//            date = "15/10",
+//            hour = "17:34",
+//            received = true
+//        ),
+//        Message(
+//            friendName = "Marcos",
+//            message = "Olá bom dia",
+//            date = "15/10",
+//            hour = "17:34",
+//            received = true
+//        )
+//    )
+//    CrypTextTheme {
+//        ConversaItemList(
+//            onClick = {},
+//            messages = messages,
+//            modifier = Modifier.fillMaxWidth()
+//        )
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun ConversaItemListEmptyPreview() {
+//    CrypTextTheme {
+//        ConversaItemList(
+//            messages = emptyList(),
+//            modifier = Modifier.fillMaxWidth()
+//        )
+//    }
+//}

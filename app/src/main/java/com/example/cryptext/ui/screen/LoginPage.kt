@@ -19,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.cryptext.R
 import com.example.cryptext.ui.components.InputText
 import com.example.cryptext.ui.components.LineSepator
@@ -27,7 +29,9 @@ import com.example.cryptext.ui.components.LoginHeader
 import com.example.cryptext.ui.theme.CrypTextTheme
 
 @Composable
-fun LoginPage() {
+fun LoginPage(
+    navController: NavHostController
+) {
     
     var email by remember { mutableStateOf("")}
     var senha by remember { mutableStateOf("")}
@@ -79,7 +83,7 @@ fun LoginPage() {
         )
         LoginButton(
             text = "Confirmar",
-            onClick = {println("login: $email, senha: $senha")},
+            onClick = { navController.navigate("conversas") },
             modifier = Modifier.padding(top = 15.dp)
         )
         Row (
@@ -91,7 +95,7 @@ fun LoginPage() {
                 style = MaterialTheme.typography.bodySmall
             )
             TextButton(
-                onClick = {}
+                onClick = { navController.navigate("signup") }
             ) {
                 Text(
                     text = "Faça Seu Cadastro?",
@@ -99,13 +103,5 @@ fun LoginPage() {
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun LoginPagePreview() {
-    CrypTextTheme {
-        LoginPage()
     }
 }

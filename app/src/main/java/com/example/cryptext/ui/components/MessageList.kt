@@ -31,7 +31,8 @@ fun MessageList(
         }
     } else {
         LazyColumn (
-            modifier = modifier
+            modifier = modifier,
+            reverseLayout = true
         ) {
             items(messages) { message ->
                 Message(

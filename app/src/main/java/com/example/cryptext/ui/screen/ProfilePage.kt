@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.cryptext.R
 import com.example.cryptext.data.ui.User
 import com.example.cryptext.ui.components.InputText
@@ -35,9 +36,12 @@ import com.example.cryptext.ui.theme.CrypTextTheme
 
 @Composable
 fun ProfilePage(
+    navController: NavHostController,
     myProfile: Boolean = false,
-    user: User
+    username: String
 ) {
+    var user = User(name = "Marcos Costa", username = "@marcos", email = "@mail", status = "Online")
+
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.verticalScroll(rememberScrollState())
@@ -110,7 +114,7 @@ fun ProfilePage(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .padding(15.dp),
-                    onClick = {}
+                    onClick = { navController.navigate("conversa/${user.username}")}
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.message_icon),
@@ -124,19 +128,5 @@ fun ProfilePage(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun ProfilePagePreview() {
-    CrypTextTheme {
-        ProfilePage(
-            user = User(
-                name = "Marcos Costa",
-                username = "@marcos",
-                email = "mcaa.eng21@uea.edu.br"
-            )
-        )
     }
 }

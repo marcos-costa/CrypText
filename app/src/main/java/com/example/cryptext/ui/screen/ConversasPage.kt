@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
 import com.example.cryptext.data.ui.Message
 import com.example.cryptext.ui.components.BottomAppBar
 import com.example.cryptext.ui.components.ConversaItemList
@@ -17,7 +18,9 @@ import com.example.cryptext.ui.components.TopAppBar
 import com.example.cryptext.ui.theme.CrypTextTheme
 
 @Composable
-fun ConversasPage() {
+fun ConversasPage(
+    navHostController: NavHostController
+) {
     var unreadMessages by remember { mutableStateOf("0") }
     var friendsSolicitations by remember { mutableStateOf("0") }
     var messages by remember { mutableStateOf<List<Message>>(emptyList())}
@@ -32,27 +35,19 @@ fun ConversasPage() {
             BottomAppBar(
                 unreadMessages = unreadMessages,
                 friendRequests = friendsSolicitations,
-                onClickConversas = {},
-                onClickFriends = {},
-                onClickProfile = {},
+                onClickConversas = { navHostController.navigate("conversas") },
+                onClickFriends = { navHostController.navigate("friends") },
+                onClickProfile = { navHostController.navigate("profile/true/") },
                 modifier = Modifier.fillMaxWidth()
             )
         },
         content = { paddingValues ->
             ConversaItemList(
+                navHostController = navHostController,
                 messages = messages,
                 modifier = Modifier.padding(paddingValues)
             )
         }
 
     )
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ConversasPagePreview() {
-    CrypTextTheme {
-        ConversasPage()
-    }
 }
