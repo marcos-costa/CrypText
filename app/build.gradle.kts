@@ -59,4 +59,8 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
     implementation("androidx.navigation:navigation-compose:2.7.4")
+    implementation(libs.socket.io.client) {
+        exclude(group = "org.json", module = "json")
+    }
+
 }
