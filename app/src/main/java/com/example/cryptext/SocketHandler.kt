@@ -3,11 +3,15 @@ package com.example.cryptext
 import android.util.Log
 import io.socket.client.IO
 import io.socket.client.Socket
+import java.math.BigInteger
 import java.net.URISyntaxException
 
 object SocketHandler {
-
     lateinit var mSocket: Socket
+
+    init{
+        this.setSocket()
+    }
 
     @Synchronized
     fun setSocket() {
@@ -27,11 +31,11 @@ object SocketHandler {
     }
 
     @Synchronized
-    fun establishConnection() {
+    fun establishConnection(privateKey: BigInteger) {
         mSocket.on(Socket.EVENT_CONNECT) {
             Log.d("connect", "Connection successful")
-            val dhClient = DiffieHellmanClient()
-            dhClient.startDiffieHellman()
+            val dhClient = DiffieHellmanClient(socket = mSocket)
+            dhClient.startDiffieHellman(privateKey)
         }
 
         mSocket.on(Socket.EVENT_CONNECT_ERROR) { args ->

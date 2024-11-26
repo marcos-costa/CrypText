@@ -2,6 +2,7 @@ package com.example.cryptext.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.cryptext.DiffieHellmanClient
 import com.example.cryptext.SocketHandler
 import com.example.cryptext.data.AppDatabase
 import com.example.cryptext.data.entity.Friend
@@ -11,6 +12,9 @@ import com.example.cryptext.data.entity.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.math.BigInteger
+import java.security.SecureRandom
 import java.sql.Timestamp
 import java.time.Instant
 import kotlin.random.Random
@@ -21,16 +25,19 @@ class MainViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            if (database.myDataDao().count() == 0){
-                database.myDataDao().insert(MyData(privateKey = Random.nextInt(1000000, 10000000 + 1)))
+            var privateKey: BigInteger = BigInteger("0")
+            if (database.myDataDao().count() == 0) {
+                privateKey = BigInteger(16, SecureRandom())
+                database.myDataDao().insert(MyData(privateKey = privateKey.toLong()))
+            } else {
+                privateKey = database.myDataDao().getMyData().privateKey.toBigInteger()
             }
+            SocketHandler.setSocket()
+            SocketHandler.establishConnection(privateKey = privateKey)
         }
-
-        SocketHandler.setSocket()
-        SocketHandler.establishConnection()
-
-        val mSocket = SocketHandler.getSocket()
     }
+
+    val socket = SocketHandler.getSocket()
 
     val friends: Flow<List<Friend>> = database.friendDao().getAllFriend()
     val friendsRequest: Flow<List<User>> = database.userDao().getAllReceivedSolicitations()
