@@ -15,7 +15,7 @@ object SocketHandler {
         val options = IO.Options()
         options.transports = arrayOf("websocket")
         try {
-            mSocket = IO.socket("http://192.168.15.6:3000", options) // trocar IP
+            mSocket = IO.socket("http://192.168.1.62:3000", options) // trocar IP
         } catch (e: URISyntaxException) {
             Log.d("error", "URISyntaxException: ${e.message}")
         }
