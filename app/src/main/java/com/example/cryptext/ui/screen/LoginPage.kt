@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.cryptext.R
+import com.example.cryptext.SocketHandler
 import com.example.cryptext.ui.components.InputText
 import com.example.cryptext.ui.components.LineSepator
 import com.example.cryptext.ui.components.LoginButton
@@ -35,6 +37,7 @@ fun LoginPage(
     
     var email by remember { mutableStateOf("")}
     var senha by remember { mutableStateOf("")}
+    val socket = SocketHandler.getSocket()
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -83,7 +86,18 @@ fun LoginPage(
         )
         LoginButton(
             text = "Confirmar",
-            onClick = { navController.navigate("conversas") },
+//            onClick = {
+//                LaunchedEffect(socket) {
+//                    socket.emit("login", {})
+//                    // Aqui você pode verificar ou realizar ações com o socket
+//                    if (socket != null && socket.isConnected) {
+//                        navController.navigate("conversas")
+//                        // Realizar ações relacionadas ao socket
+//                    } else {
+//                        println("Socket não está conectado ou é nulo.")
+//                    }
+//                } },
+            onClick = {navController.navigate("conversas")},
             modifier = Modifier.padding(top = 15.dp)
         )
         Row (
