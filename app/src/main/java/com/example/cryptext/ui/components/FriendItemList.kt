@@ -10,14 +10,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.cryptext.R
-import com.example.cryptext.data.ui.User
+import com.example.cryptext.data.domain.UserUI
+import com.example.cryptext.data.entity.Friend
+import com.example.cryptext.data.entity.User
 import com.example.cryptext.ui.theme.CrypTextTheme
+import com.example.cryptext.ui.viewmodel.MainViewModel
 
 @Composable
 fun FriendItemList(
     friendRequests: List<User>,
-    friends: List<User>,
+    friends: List<Friend>,
+    navHostController: NavHostController,
+    viewModel: MainViewModel,
     modifier: Modifier = Modifier
 ) {
     LazyColumn (
@@ -34,9 +40,11 @@ fun FriendItemList(
             )
         }
         if (friendRequests.isNotEmpty()){
-            items(friendRequests) { friend ->
+            items(friendRequests) { user ->
                 FriendRequestItem(
-                    user = friend,
+                    user = user,
+                    onAccept = {viewModel.acceptFriend(user)},
+                    onDecline = {viewModel.declineFriend(user)},
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 10.dp)
@@ -64,11 +72,14 @@ fun FriendItemList(
         if (friends.isNotEmpty()) {
             items(friends) { friend ->
                 FriendItem(
-                    user = friend,
+                    friend = friend,
+                    onClick = {
+                        val username = friend.username
+                        navHostController.navigate("friendProfile/$username")
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 10.dp)
-
                 )
             }
         }else {
@@ -80,62 +91,5 @@ fun FriendItemList(
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun FriendItemEmptyListPreview() {
-    CrypTextTheme {
-        FriendItemList(
-            friendRequests = emptyList<User>(),
-            friends = emptyList<User>()
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun FriendItemListPreview() {
-    val friends = listOf(
-        User(
-            name = "Marcos Costa",
-            username = "@marcos",
-            email = "marcos@mail.com"
-        ),
-        User(
-            name = "Marcos Costa",
-            username = "@marcos",
-            email = "marcos@mail.com",
-            status = "Offline"
-        ),
-        User(
-            name = "Marcos Costa",
-            username = "@marcos",
-            email = "marcos@mail.com"
-        )
-    )
-    val friendRequests = listOf(
-        User(
-            name = "Marcos Costa",
-            username = "@marcos",
-            email = "marcos@mail.com"
-        ),
-        User(
-            name = "Marcos Costa",
-            username = "@marcos",
-            email = "marcos@mail.com"
-        ),
-        User(
-            name = "Marcos Costa",
-            username = "@marcos",
-            email = "marcos@mail.com"
-        )
-    )
-    CrypTextTheme {
-        FriendItemList(
-            friendRequests = friendRequests,
-            friends = friends
-        )
     }
 }

@@ -28,6 +28,7 @@ fun BottonConversaBar(
     text: String,
     placeHolderText: String,
     onValueChange: (String) -> Unit,
+    onSend: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row (
@@ -59,7 +60,7 @@ fun BottonConversaBar(
                 disabledContainerColor = Color.White,
                 disabledContentColor = Color(0xFF65558F)
             ),
-            onClick = {}
+            onClick = { onSend() }
         ) {
             Icon(
                 painter = painterResource(R.drawable.send_icon),
@@ -78,6 +79,7 @@ fun BottonConversaBarPreview() {
             text = "",
             placeHolderText = "Digite sua mensagem",
             onValueChange = {},
+            onSend = {},
             modifier = Modifier.fillMaxWidth().padding(15.dp)
         )
     }

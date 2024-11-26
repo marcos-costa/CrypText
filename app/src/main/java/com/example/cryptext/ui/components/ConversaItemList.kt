@@ -1,29 +1,26 @@
 package com.example.cryptext.ui.components
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.cryptext.data.ui.Message
-import com.example.cryptext.ui.theme.CrypTextTheme
+import com.example.cryptext.data.domain.MessageUI
+import com.example.cryptext.data.entity.Message
+import com.example.cryptext.ui.viewmodel.MainViewModel
 
 @Composable
 fun ConversaItemList(
     navHostController: NavHostController,
-    messages: List<Message>,
+    lastChats: List<Message>,
     modifier: Modifier = Modifier
 ) {
-    if (messages.isEmpty()){
+    if (lastChats.isEmpty()){
         Column (
             modifier = modifier
         ) {
@@ -37,9 +34,12 @@ fun ConversaItemList(
         LazyColumn (
             modifier = modifier
         ) {
-            items(messages) { message ->
+            items(lastChats) { message ->
                 ConversaItem(
-                    onClick = { navHostController.navigate("conversas/${message.friendName}" )},
+                    onClick = {
+                        val username = message.friend
+                        navHostController.navigate("conversa/$username")
+                              },
                     message = message,
                     modifier = Modifier.padding(top = 10.dp)
                 )

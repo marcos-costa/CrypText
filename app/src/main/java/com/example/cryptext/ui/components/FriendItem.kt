@@ -2,6 +2,7 @@ package com.example.cryptext.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,18 +21,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cryptext.R
-import com.example.cryptext.data.ui.User
+import com.example.cryptext.data.domain.UserUI
+import com.example.cryptext.data.entity.Friend
 import com.example.cryptext.ui.theme.CrypTextTheme
 
 @Composable
 fun FriendItem(
-    user: User,
+    friend: Friend,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row (
         modifier = modifier
             .clip(CircleShape)
-            .background(Color(0xFFE5E9FF)),
+            .background(Color(0xFFE5E9FF))
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
@@ -45,12 +49,12 @@ fun FriendItem(
             modifier = Modifier.padding(start = 10.dp)
         ){
             Text (
-                text = user.name,
+                text = friend.name,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 10.dp)
             )
             Text (
-                text = user.username,
+                text = friend.username,
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -62,9 +66,9 @@ fun FriendItem(
                 .padding(end = 15.dp)
         ) {
             Text (
-                text = user.status,
+                text = friend.status,
                 modifier = Modifier
-                    .background(if (user.status == "Online") {
+                    .background(if (friend.status == "Online") {
                         Color(0xFF83CED0)
                     } else {
                         Color(0xFFF1B580)
@@ -72,19 +76,5 @@ fun FriendItem(
                     .padding(10.dp)
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfileItemPreview() {
-    CrypTextTheme {
-        FriendItem(
-            user = User (
-                name = "Marcos",
-                username = "@marcos",
-                email = "marcos@mail.com"
-            )
-        )
     }
 }

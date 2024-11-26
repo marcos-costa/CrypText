@@ -4,26 +4,28 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
-import com.example.cryptext.data.ui.Message
+import com.example.cryptext.data.domain.MessageUI
 import com.example.cryptext.ui.components.BottomAppBar
 import com.example.cryptext.ui.components.ConversaItemList
 import com.example.cryptext.ui.components.TopAppBar
-import com.example.cryptext.ui.theme.CrypTextTheme
+import com.example.cryptext.ui.viewmodel.MainViewModel
 
 @Composable
 fun ConversasPage(
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    viewModel: MainViewModel
 ) {
-    var unreadMessages by remember { mutableStateOf("0") }
-    var friendsSolicitations by remember { mutableStateOf("0") }
-    var messages by remember { mutableStateOf<List<Message>>(emptyList())}
+    var unreadMessages = viewModel.unreadMessagesCount.collectAsState(initial = 0)
+    var friendsSolicitations = viewModel.pendingSolicitationsCount.collectAsState(initial = 0)
+
+    var lastMessages = viewModel.lastChat.collectAsState(initial = emptyList())
 
     Scaffold (
         topBar = {
@@ -33,8 +35,8 @@ fun ConversasPage(
         },
         bottomBar = {
             BottomAppBar(
-                unreadMessages = unreadMessages,
-                friendRequests = friendsSolicitations,
+                unreadMessages = unreadMessages.value,
+                friendRequests = friendsSolicitations.value,
                 onClickConversas = { navHostController.navigate("conversas") },
                 onClickFriends = { navHostController.navigate("friends") },
                 onClickProfile = { navHostController.navigate("profile/true/") },
@@ -44,7 +46,7 @@ fun ConversasPage(
         content = { paddingValues ->
             ConversaItemList(
                 navHostController = navHostController,
-                messages = messages,
+                lastChats = lastMessages.value,
                 modifier = Modifier.padding(paddingValues)
             )
         }

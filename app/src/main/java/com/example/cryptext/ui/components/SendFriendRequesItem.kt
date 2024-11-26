@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.MaterialTheme
@@ -22,12 +21,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cryptext.R
-import com.example.cryptext.data.ui.User
+import com.example.cryptext.data.domain.UserUI
 import com.example.cryptext.ui.theme.CrypTextTheme
 
 @Composable
 fun SendFriendRequestItem(
-    user: User,
+    userUI: UserUI,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -48,12 +47,12 @@ fun SendFriendRequestItem(
             modifier = Modifier.padding(start = 10.dp)
         ){
             Text (
-                text = user.name,
+                text = userUI.name,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 10.dp)
             )
             Text (
-                text = user.username,
+                text = userUI.username,
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -87,7 +86,7 @@ fun SendFriendRequestItem(
 fun SendFriendRequestItemPreview() {
     CrypTextTheme {
         SendFriendRequestItem(
-            user = User (
+            userUI = UserUI (
                 name = "Marcos",
                 username = "@marcos",
                 email = "marcos@mail.com"

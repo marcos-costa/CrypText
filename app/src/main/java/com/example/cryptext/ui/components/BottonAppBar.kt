@@ -27,8 +27,8 @@ import com.example.cryptext.ui.theme.CrypTextTheme
 
 @Composable
 fun BottomAppBar(
-    unreadMessages: String,
-    friendRequests: String,
+    unreadMessages: Int,
+    friendRequests: Int,
     onClickConversas: () -> Unit,
     onClickFriends: () -> Unit,
     onClickProfile: () -> Unit,
@@ -55,7 +55,7 @@ fun BottomAppBar(
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
-            if (unreadMessages != "0"){
+            if (unreadMessages != 0){
                 Box(
                     modifier = Modifier
                         .padding(5.dp)
@@ -65,7 +65,7 @@ fun BottomAppBar(
                         .align(Alignment.TopEnd)
                 ) {
                     Text(
-                        text = unreadMessages,
+                        text = unreadMessages.toString(),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier
                             .align(Alignment.Center)
@@ -90,7 +90,7 @@ fun BottomAppBar(
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
-            if (friendRequests != "0") {
+            if (friendRequests != 0) {
                 Box(
                     modifier = Modifier
                         .padding(5.dp)
@@ -100,7 +100,7 @@ fun BottomAppBar(
                         .align(Alignment.TopEnd)
                 ) {
                     Text(
-                        text = friendRequests,
+                        text = friendRequests.toString(),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier
                             .align(Alignment.Center)
@@ -134,8 +134,8 @@ fun BottomAppBar(
 fun BottonAppBarPreview(){
     CrypTextTheme {
         BottomAppBar(
-            unreadMessages = "5",
-            friendRequests = "3",
+            unreadMessages = 5,
+            friendRequests = 3,
             onClickConversas = {},
             onClickFriends = {},
             onClickProfile = {},
@@ -149,8 +149,8 @@ fun BottonAppBarPreview(){
 fun BottonAppBarPreview2(){
     CrypTextTheme {
         BottomAppBar(
-            unreadMessages = "0",
-            friendRequests = "0",
+            unreadMessages = 0,
+            friendRequests = 0,
             onClickConversas = {},
             onClickFriends = {},
             onClickProfile = {},

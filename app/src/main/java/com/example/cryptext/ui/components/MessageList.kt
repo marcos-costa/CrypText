@@ -11,7 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.cryptext.data.ui.Message
+import com.example.cryptext.data.domain.MessageUI
+import com.example.cryptext.data.entity.Message
 import com.example.cryptext.ui.theme.CrypTextTheme
 
 @Composable
@@ -35,45 +36,11 @@ fun MessageList(
             reverseLayout = true
         ) {
             items(messages) { message ->
-                Message(
+                MessageBuble(
                     message = message,
                     modifier = Modifier.padding(horizontal = 15.dp)
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun MessageListPreview(){
-    val messages = listOf(
-        Message(
-            friendName = "Marcos",
-            message = "Olá bom dia",
-            date = "15/10",
-            hour = "17:34",
-            received = true
-        ),
-        Message(
-            friendName = "Marcos",
-            message = "Olá bom dia",
-            date = "15/10",
-            hour = "17:34",
-            received = false
-        ),
-        Message(
-            friendName = "Marcos",
-            message = "Olá bom dia",
-            date = "15/10",
-            hour = "17:34",
-            received = true
-        )
-    )
-    CrypTextTheme {
-        MessageList(
-            messages = messages,
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }

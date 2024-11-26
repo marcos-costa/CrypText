@@ -1,17 +1,13 @@
 package com.example.cryptext.ui.screen
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -20,27 +16,31 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.cryptext.R
-import com.example.cryptext.data.ui.User
+import com.example.cryptext.data.domain.UserUI
+import com.example.cryptext.data.entity.Friend
 import com.example.cryptext.ui.components.InputText
 import com.example.cryptext.ui.components.LineSepator
 import com.example.cryptext.ui.components.TopAppBar
-import com.example.cryptext.ui.theme.CrypTextTheme
+import com.example.cryptext.ui.viewmodel.MainViewModel
 
 @Composable
 fun ProfilePage(
     navController: NavHostController,
+    viewModel: MainViewModel,
     myProfile: Boolean = false,
     username: String
 ) {
-    var user = User(name = "Marcos Costa", username = "@marcos", email = "@mail", status = "Online")
+    viewModel.getFriend(username)
+
+    val friend = viewModel.friend.collectAsState(initial = Friend(id = "0",name = "Desconhecido", email = "none", username = "@none", sharedKey = "none", ))
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -67,7 +67,7 @@ fun ProfilePage(
             placeHolderText = "",
             password = false,
             enabled = false,
-            value = user.name,
+            value = friend.value.name,
             onValueChange = {},
             modifier = Modifier
                 .fillMaxWidth()
@@ -79,7 +79,7 @@ fun ProfilePage(
             placeHolderText = "",
             password = false,
             enabled = false,
-            value = user.username,
+            value = friend.value.username,
             onValueChange = {},
             modifier = Modifier
                 .fillMaxWidth()
@@ -91,7 +91,7 @@ fun ProfilePage(
             placeHolderText = "",
             password = false,
             enabled = false,
-            value = user.email,
+            value = friend.value.email,
             onValueChange = {},
             modifier = Modifier
                 .fillMaxWidth()
@@ -114,7 +114,9 @@ fun ProfilePage(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .padding(15.dp),
-                    onClick = { navController.navigate("conversa/${user.username}")}
+                    onClick = {
+                        val username = friend.value.username
+                        navController.navigate("conversa/$username")}
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.message_icon),

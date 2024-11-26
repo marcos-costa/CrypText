@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -24,12 +23,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cryptext.R
-import com.example.cryptext.data.ui.User
+import com.example.cryptext.data.domain.UserUI
+import com.example.cryptext.data.entity.User
 import com.example.cryptext.ui.theme.CrypTextTheme
 
 @Composable
 fun FriendRequestItem(
     user: User,
+    onAccept: () -> Unit,
+    onDecline: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row (
@@ -76,7 +78,7 @@ fun FriendRequestItem(
                         disabledContainerColor = Color(0xFF83CED0),
                         disabledContentColor = Color(0xFF2A2A2A)
                     ),
-                    onClick = {}
+                    onClick = { onAccept() }
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.accept_icon),
@@ -86,13 +88,13 @@ fun FriendRequestItem(
                 }
                 FilledIconButton(
                     modifier = Modifier.size(40.dp),
+                    onClick = { onDecline() },
                     colors = IconButtonColors(
                         containerColor = Color(0xFFF1B580),
                         contentColor = Color(0xFF2A2A2A),
                         disabledContainerColor = Color(0xFFF1B580),
                         disabledContentColor = Color(0xFF2A2A2A)
-                    ),
-                    onClick = {}
+                    )
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.decline_icon),
@@ -102,20 +104,5 @@ fun FriendRequestItem(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfileFriendRequestItemPreview() {
-    CrypTextTheme {
-        FriendRequestItem(
-            user = User (
-                name = "Marcos",
-                username = "@marcos",
-                email = "marcos@mail.com"
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }

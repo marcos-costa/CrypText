@@ -1,9 +1,12 @@
 package com.example.cryptext
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.cryptext.data.AppDatabase
 import com.example.cryptext.ui.screen.ConversaPage
 import com.example.cryptext.ui.screen.ConversasPage
 import com.example.cryptext.ui.screen.FriendRequesPage
@@ -11,15 +14,17 @@ import com.example.cryptext.ui.screen.FriendsPage
 import com.example.cryptext.ui.screen.LoginPage
 import com.example.cryptext.ui.screen.ProfilePage
 import com.example.cryptext.ui.screen.SingUpPage
+import com.example.cryptext.ui.viewmodel.MainViewModel
 
 @Composable
-fun MyApp() {
+fun MyApp(database: AppDatabase) {
     val navController = rememberNavController()
 
     NavHost(
         navController = navController,
         startDestination = "login"
     ) {
+        val viewModel = MainViewModel(database)
         composable("login") {
             LoginPage(
                 navController
@@ -28,43 +33,62 @@ fun MyApp() {
 
         composable("signup") {
             SingUpPage(
-                navController
+                navController,
             )
         }
 
         composable("conversas") {
             ConversasPage(
-                navController
+                navController,
+                viewModel
             )
         }
 
-        composable("conversa/{username}") { backStackEntry ->
+        composable(
+            route = "conversa/{username}",
+            arguments = listOf(
+                navArgument("username") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
+
             ConversaPage(
                 navController,
+                viewModel,
                 username
             )
         }
 
         composable("friends") {
             FriendsPage(
-                navController
+                navController,
+                viewModel
             )
         }
 
         composable("friendsRequest") {
             FriendRequesPage(
-                navController
+                navController,
+                viewModel
             )
         }
 
-        composable("profile/{myproflie}/{username}") { backStackEntry ->
+        composable(
+            route = "friendProfile/{username}",
+            arguments = listOf(
+                navArgument("username") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
-            val myprofile = backStackEntry.arguments?.getBoolean("username") ?: true
 
             ProfilePage(
                 navController,
-                myProfile = myprofile,
+                viewModel,
+                myProfile = false,
                 username = username
             )
         }

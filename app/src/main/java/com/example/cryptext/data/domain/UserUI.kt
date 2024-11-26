@@ -1,6 +1,6 @@
-package com.example.cryptext.data.ui
+package com.example.cryptext.data.domain
 
-data class User (
+data class UserUI (
     val name: String,
     val username: String,
     val email: String,

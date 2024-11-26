@@ -22,11 +22,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.example.cryptext.R
-import com.example.cryptext.data.ui.Message
+import com.example.cryptext.data.domain.MessageUI
+import com.example.cryptext.data.entity.Message
 import com.example.cryptext.ui.theme.CrypTextTheme
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun ConversaItem(
@@ -52,12 +54,12 @@ fun ConversaItem(
             modifier = Modifier.padding(start = 10.dp)
         ){
             Text (
-                text = message.friendName,
+                text = message.friend,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 10.dp)
             )
             Text (
-                text = message.message,
+                text = message.content,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -72,33 +74,12 @@ fun ConversaItem(
                 .align(Alignment.Top)
                 .padding(top = 15.dp, end = 15.dp)
         ) {
+            val formatter = DateTimeFormatter.ofPattern("dd-MM HH:mm")
+                .withZone(ZoneId.systemDefault())
             Text(
-                text = message.date,
-                style = MaterialTheme.typography.bodySmall
-            )
-            Text(
-                text = message.hour,
+                text = formatter.format(Instant.ofEpochMilli(message.timestamp)),
                 style = MaterialTheme.typography.bodySmall
             )
         }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun ConversaItemPreview() {
-    CrypTextTheme {
-        ConversaItem(
-            onClick = {},
-            message = Message(
-                friendName = "Marcos",
-                message = "Olá bom lakjsdlçkjasçlkdjfçlaksjdfçlkajsdçlkfjaçlskdjflaksjdf",
-                date = "15/10",
-                hour = "17:34",
-                received = true
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-        )
     }
 }

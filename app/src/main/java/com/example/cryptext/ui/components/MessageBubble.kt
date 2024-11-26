@@ -15,12 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.cryptext.data.ui.Message
+import com.example.cryptext.data.domain.MessageUI
+import com.example.cryptext.data.entity.Message
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
-fun Message (
+fun MessageBuble (
     message: Message,
     modifier: Modifier = Modifier
 ) {
@@ -33,7 +36,7 @@ fun Message (
             horizontalAlignment = if (message.received) Alignment.Start else Alignment.End
         ) {
             Text(
-                text = message.message,
+                text = message.content,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .clip(
@@ -51,47 +54,14 @@ fun Message (
                 horizontalArrangement = if (message.received) Arrangement.Start else Arrangement.End,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                val formatter = DateTimeFormatter.ofPattern("dd-MM HH:mm")
+                    .withZone(ZoneId.systemDefault())
                 Text(
-                    text = message.date,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(5.dp)
-                )
-                Text(
-                    text = message.hour,
+                    text = formatter.format(Instant.ofEpochMilli(message.timestamp)),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(5.dp)
                 )
             }
         }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun MessagePreviewReceived() {
-    Message(
-        Message(
-            friendName = "Marcos",
-            message = "Lorem ipsum dolor",
-            date = "12/02",
-            hour = "12:50",
-            received = true
-            ),
-        modifier = Modifier.padding(15.dp)
-    )
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun MessagePreviewSend() {
-    Message(
-        Message(
-            friendName = "Marcos",
-            message = "Lorem ipsum dolor sit amet. Sit quis impedit aut accusantium quisquam est iure eaque qui eius dicta.",
-            date = "12/02",
-            hour = "12:50",
-            received = false
-        ),
-        modifier = Modifier.padding(15.dp)
-    )
 }
