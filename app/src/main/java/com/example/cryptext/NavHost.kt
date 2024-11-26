@@ -22,13 +22,13 @@ fun MyApp(database: AppDatabase) {
 
     NavHost(
         navController = navController,
-        startDestination = "login//"
+        startDestination = "login/a/a"
     ) {
 
         val viewModel = MainViewModel(database)
 
         composable(
-            route = "conversa/{email}/{senha}",
+            route = "login/{email}/{senha}",
             arguments = listOf(
                 navArgument("email") {
                     type = NavType.StringType
