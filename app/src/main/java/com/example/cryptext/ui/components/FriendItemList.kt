@@ -8,14 +8,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.cryptext.R
-import com.example.cryptext.data.domain.UserUI
 import com.example.cryptext.data.entity.Friend
 import com.example.cryptext.data.entity.User
-import com.example.cryptext.ui.theme.CrypTextTheme
 import com.example.cryptext.ui.viewmodel.MainViewModel
 
 @Composable

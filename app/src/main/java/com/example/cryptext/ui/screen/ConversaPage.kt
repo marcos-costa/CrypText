@@ -13,8 +13,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.cryptext.data.domain.MessageUI
-import com.example.cryptext.data.domain.UserUI
 import com.example.cryptext.data.entity.Friend
 import com.example.cryptext.ui.components.BottonConversaBar
 import com.example.cryptext.ui.components.MessageList

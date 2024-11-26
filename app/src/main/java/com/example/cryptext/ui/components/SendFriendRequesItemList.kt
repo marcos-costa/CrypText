@@ -11,22 +11,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.cryptext.data.domain.UserUI
+import com.example.cryptext.data.entity.User
 import com.example.cryptext.ui.theme.CrypTextTheme
 
 @Composable
 fun SendFriendRequestItemList (
-    userUIS: List<UserUI>,
+    users: List<User>,
     modifier: Modifier = Modifier
 ) {
     Row (
         modifier = modifier
     ) {
         LazyColumn {
-            if (userUIS.isNotEmpty()){
-                items(userUIS) { user ->
+            if (users.isNotEmpty()){
+                items(users) { user ->
                     SendFriendRequestItem(
-                        userUI = user,
+                        user = user,
                         onClick = {},
                         modifier = Modifier
                             .fillMaxWidth()
@@ -45,31 +45,4 @@ fun SendFriendRequestItemList (
     }
 }
 
-
-@Preview(showBackground = true)
-@Composable
-fun SendFriendRequestItemListPreveiw() {
-    val userUIS = listOf(
-        UserUI(
-            name = "Marcos Costa",
-            username = "@marcos",
-            email = "marcos@mail.com"
-        ),
-        UserUI(
-            name = "Marcos Costa",
-            username = "@marcos",
-            email = "marcos@mail.com"
-        ),
-        UserUI(
-            name = "Marcos Costa",
-            username = "@marcos",
-            email = "marcos@mail.com"
-        )
-    )
-    CrypTextTheme {
-        SendFriendRequestItemList(
-            userUIS = userUIS,
-        )
-    }
-}
 

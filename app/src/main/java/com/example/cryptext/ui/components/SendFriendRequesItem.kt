@@ -18,15 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cryptext.R
-import com.example.cryptext.data.domain.UserUI
-import com.example.cryptext.ui.theme.CrypTextTheme
+import com.example.cryptext.data.entity.User
 
 @Composable
 fun SendFriendRequestItem(
-    userUI: UserUI,
+    user: User,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -47,12 +45,12 @@ fun SendFriendRequestItem(
             modifier = Modifier.padding(start = 10.dp)
         ){
             Text (
-                text = userUI.name,
+                text = user.name,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 10.dp)
             )
             Text (
-                text = userUI.username,
+                text = user.username,
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -78,20 +76,5 @@ fun SendFriendRequestItem(
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SendFriendRequestItemPreview() {
-    CrypTextTheme {
-        SendFriendRequestItem(
-            userUI = UserUI (
-                name = "Marcos",
-                username = "@marcos",
-                email = "marcos@mail.com"
-            ),
-            onClick = {}
-        )
     }
 }

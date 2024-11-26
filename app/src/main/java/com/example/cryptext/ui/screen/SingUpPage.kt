@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.cryptext.R
 import com.example.cryptext.ui.components.InputText
@@ -22,10 +23,12 @@ import com.example.cryptext.ui.components.LineSepator
 import com.example.cryptext.ui.components.LoginButton
 import com.example.cryptext.ui.components.SingUpHeader
 import com.example.cryptext.ui.theme.CrypTextTheme
+import com.example.cryptext.ui.viewmodel.MainViewModel
 
 @Composable
 fun SingUpPage(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: MainViewModel
 ){
 
     var name by remember { mutableStateOf("")}
@@ -88,7 +91,15 @@ fun SingUpPage(
         )
         LoginButton(
             text = "Confirmar",
-            onClick = { navController.navigate("conversas") }
+            onClick = {
+                viewModel.singUp(
+                    name = name,
+                    email = email,
+                    username = username,
+                    password = senha
+                )
+                navController.navigate("login/$email/$senha")
+            }
         )
     }
 }

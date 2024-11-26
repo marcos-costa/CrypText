@@ -31,6 +31,9 @@ interface UserDao {
     fun getAllUsers(): Flow<List<User>>
 
     @Query("SELECT * FROM user WHERE publicKey IS NOT NULL")
+    fun getAllReceivedSolicitations(): Flow<List<User>>
+
+    @Query("SELECT * FROM user WHERE publicKey IS NULL")
     fun getAllPendingSolicitations(): Flow<List<User>>
 
     @Query("SELECT COUNT(*) FROM user WHERE publicKey IS NOT NULL")

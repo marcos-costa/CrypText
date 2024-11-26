@@ -23,7 +23,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cryptext.R
-import com.example.cryptext.data.domain.MessageUI
 import com.example.cryptext.data.entity.Message
 import com.example.cryptext.ui.theme.CrypTextTheme
 import java.time.Instant

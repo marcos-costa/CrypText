@@ -22,18 +22,36 @@ fun MyApp(database: AppDatabase) {
 
     NavHost(
         navController = navController,
-        startDestination = "login"
+        startDestination = "login//"
     ) {
+
         val viewModel = MainViewModel(database)
-        composable("login") {
+
+        composable(
+            route = "conversa/{email}/{senha}",
+            arguments = listOf(
+                navArgument("email") {
+                    type = NavType.StringType
+                },
+                navArgument("senha") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            val senha = backStackEntry.arguments?.getString("senha") ?: ""
+
             LoginPage(
-                navController
+                navController,
+                email = email,
+                senha = senha
             )
         }
 
         composable("signup") {
             SingUpPage(
                 navController,
+                viewModel,
             )
         }
 

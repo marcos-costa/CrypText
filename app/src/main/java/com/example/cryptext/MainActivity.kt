@@ -14,14 +14,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        SocketHandler.setSocket()
-        SocketHandler.establishConnection()
-
-        val mSocket = SocketHandler.getSocket()
-
-        // diffie hellman
-        mSocket.emit("counter")
-
         val database = AppDatabase.getDatabase(this)
 
         lifecycleScope.launch(Dispatchers.IO) {

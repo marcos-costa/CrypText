@@ -32,11 +32,13 @@ import com.example.cryptext.ui.theme.CrypTextTheme
 
 @Composable
 fun LoginPage(
-    navController: NavHostController
+    navController: NavHostController,
+    email: String,
+    senha: String
 ) {
     
-    var email by remember { mutableStateOf("")}
-    var senha by remember { mutableStateOf("")}
+    var email by remember { mutableStateOf(email)}
+    var senha by remember { mutableStateOf(senha)}
     val socket = SocketHandler.getSocket()
 
     Column (
@@ -86,17 +88,6 @@ fun LoginPage(
         )
         LoginButton(
             text = "Confirmar",
-//            onClick = {
-//                LaunchedEffect(socket) {
-//                    socket.emit("login", {})
-//                    // Aqui você pode verificar ou realizar ações com o socket
-//                    if (socket != null && socket.isConnected) {
-//                        navController.navigate("conversas")
-//                        // Realizar ações relacionadas ao socket
-//                    } else {
-//                        println("Socket não está conectado ou é nulo.")
-//                    }
-//                } },
             onClick = {navController.navigate("conversas")},
             modifier = Modifier.padding(top = 15.dp)
         )

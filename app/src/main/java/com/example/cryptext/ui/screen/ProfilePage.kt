@@ -24,7 +24,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.cryptext.R
-import com.example.cryptext.data.domain.UserUI
 import com.example.cryptext.data.entity.Friend
 import com.example.cryptext.ui.components.InputText
 import com.example.cryptext.ui.components.LineSepator

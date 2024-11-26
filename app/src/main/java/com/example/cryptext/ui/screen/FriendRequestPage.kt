@@ -29,6 +29,8 @@ fun FriendRequesPage(
     var unreadMessages = viewModel.unreadMessagesCount.collectAsState(initial = 0)
     var friendsSolicitations = viewModel.pendingSolicitationsCount.collectAsState(initial = 0)
 
+    var friendSolicitations = viewModel.friendSolicitations.collectAsState(initial = emptyList())
+
     var value by remember { mutableStateOf("") }
     Scaffold (
         topBar = {
@@ -56,7 +58,7 @@ fun FriendRequesPage(
         },
         content = { paddingValues ->
             SendFriendRequestItemList(
-                userUIS = emptyList(),
+                users = friendSolicitations.value,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(paddingValues)
