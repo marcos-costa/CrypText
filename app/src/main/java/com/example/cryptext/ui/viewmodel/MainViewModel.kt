@@ -1,43 +1,48 @@
 package com.example.cryptext.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.cryptext.DiffieHellmanClient
-import com.example.cryptext.SocketHandler
 import com.example.cryptext.data.AppDatabase
+import com.example.cryptext.data.UserDataRepository
 import com.example.cryptext.data.entity.Friend
 import com.example.cryptext.data.entity.Message
-import com.example.cryptext.data.entity.MyData
 import com.example.cryptext.data.entity.User
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import java.time.Instant
+import com.example.cryptext.backendIntegration.SocketHandler
+import com.example.cryptext.data.ServerSharedKey
+import com.example.cryptext.encrypt.encryptBlowfish
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import java.math.BigInteger
 import java.security.SecureRandom
-import java.sql.Timestamp
-import java.time.Instant
-import kotlin.random.Random
+
 
 class MainViewModel(
     private val database: AppDatabase,
+    private val userDataRepository: UserDataRepository
 ) : ViewModel() {
 
+    private var TAG = "CrypText - ViewModel"
+
+    lateinit var privateKey: BigInteger
+
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            var privateKey: BigInteger = BigInteger("0")
-            if (database.myDataDao().count() == 0) {
-                privateKey = BigInteger(16, SecureRandom())
-                database.myDataDao().insert(MyData(privateKey = privateKey.toLong()))
-            } else {
-                privateKey = database.myDataDao().getMyData().privateKey.toBigInteger()
+        viewModelScope.launch {
+            privateKey = userDataRepository.privateKey.first().toBigInteger()
+            if (privateKey == BigInteger("0")){
+                privateKey = BigInteger.probablePrime(16, SecureRandom())
+                userDataRepository.savePrivateKey(privateKey)
             }
-            SocketHandler.setSocket()
-            SocketHandler.establishConnection(privateKey = privateKey)
+
+            SocketHandler.connect("http://192.168.1.26:3000")
+            SocketHandler.diffieHellmanKeyExchange(privateKey)
         }
     }
-
-    val socket = SocketHandler.getSocket()
 
     val friends: Flow<List<Friend>> = database.friendDao().getAllFriend()
     val friendsRequest: Flow<List<User>> = database.userDao().getAllReceivedSolicitations()
@@ -48,6 +53,12 @@ class MainViewModel(
     val pendingSolicitationsCount: Flow<Int> = database.userDao().getPendingSolicitatinonsCount()
 
     val lastChat: Flow<List<Message>> = database.messageDao().getLastMessages()
+
+    var myData = userDataRepository.userData
+
+    var isRegistrated = MutableStateFlow(false)
+    var isLogged = MutableStateFlow(false)
+
 
     lateinit var friend: Flow<Friend>
     lateinit var  friendMessages: Flow<List<Message>>
@@ -66,21 +77,33 @@ class MainViewModel(
     }
 
     fun singUp(name: String, username: String, email: String, password: String){
-        viewModelScope.launch(Dispatchers.IO) {
-            val data = database.myDataDao().getMyData()
-            val newData = MyData(
-                name = name,
-                username = username,
-                email = email,
-                password = password,
-                privateKey = data.privateKey
-            )
-            database.myDataDao().insert(newData)
+        Log.d(TAG, "Sending Register user request")
+        Log.d(TAG, "User Data -> name: $name, username: $username, email: $email, password: $password")
+
+        val encryptedName = encryptBlowfish(ServerSharedKey.value.toString(), name)
+        val encryptedUsername = encryptBlowfish(ServerSharedKey.value.toString(), username)
+        val encryptedEmail = encryptBlowfish(ServerSharedKey.value.toString(), email)
+        val encryptedPassword = encryptBlowfish(ServerSharedKey.value.toString(), password)
+
+        Log.d(TAG, "User Data Encrypted -> name: $encryptedName, username: $encryptedUsername, email: $encryptedEmail, password: $encryptedPassword")
+
+        SocketHandler.singUp(encryptedName, encryptedEmail, encryptedPassword, encryptedUsername, "") {
+            isRegistrated.value = it
         }
     }
 
     fun login(email: String, password: String){
+        Log.d(TAG, "Sending Login user request")
+        Log.d(TAG, "User Data -> email: $email, password: $password")
 
+        val encryptedEmail = encryptBlowfish(ServerSharedKey.value.toString(), email)
+        val encryptedPassword = encryptBlowfish(ServerSharedKey.value.toString(), password)
+
+        Log.d(TAG, "User Data Encrypted -> email: $encryptedEmail, password: $encryptedPassword")
+
+        SocketHandler.login(encryptedEmail, encryptedPassword) {
+            isLogged.value = it
+        }
     }
 
 

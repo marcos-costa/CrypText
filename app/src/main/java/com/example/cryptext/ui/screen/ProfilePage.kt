@@ -39,7 +39,22 @@ fun ProfilePage(
 ) {
     viewModel.getFriend(username)
 
-    val friend = viewModel.friend.collectAsState(initial = Friend(id = "0",name = "Desconhecido", email = "none", username = "@none", sharedKey = "none", ))
+    var nome: String = ""
+    var username: String = ""
+    var email: String = ""
+
+    if (!myProfile) {
+        val friend = viewModel.friend.collectAsState(initial = Friend(id = "0",name = "Desconhecido", email = "none", username = "@none", sharedKey = "none", ))
+        nome = friend.value.name
+        username = friend.value.username
+        email = friend.value.email
+    } else {
+        val myData = viewModel.myData.collectAsState(initial = MyData(privateKey = 0))
+        nome = myData.value.name ?: ""
+        username = myData.value.username ?: ""
+        email = myData.value.email ?: ""
+    }
+
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -66,7 +81,7 @@ fun ProfilePage(
             placeHolderText = "",
             password = false,
             enabled = false,
-            value = friend.value.name,
+            value = nome,
             onValueChange = {},
             modifier = Modifier
                 .fillMaxWidth()
@@ -78,7 +93,7 @@ fun ProfilePage(
             placeHolderText = "",
             password = false,
             enabled = false,
-            value = friend.value.username,
+            value = username,
             onValueChange = {},
             modifier = Modifier
                 .fillMaxWidth()
@@ -90,7 +105,7 @@ fun ProfilePage(
             placeHolderText = "",
             password = false,
             enabled = false,
-            value = friend.value.email,
+            value = email,
             onValueChange = {},
             modifier = Modifier
                 .fillMaxWidth()
@@ -114,7 +129,7 @@ fun ProfilePage(
                         .align(Alignment.BottomEnd)
                         .padding(15.dp),
                     onClick = {
-                        val username = friend.value.username
+                        val username = username
                         navController.navigate("conversa/$username")}
                 ) {
                     Icon(

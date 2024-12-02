@@ -6,25 +6,21 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.cryptext.data.dao.FriendDao
 import com.example.cryptext.data.dao.MessageDao
-import com.example.cryptext.data.dao.MyDataDao
 import com.example.cryptext.data.dao.UserDao
 import com.example.cryptext.data.entity.Friend
 import com.example.cryptext.data.entity.Message
-import com.example.cryptext.data.entity.MyData
 import com.example.cryptext.data.entity.User
 
 @Database(entities = [
     User::class,
     Friend::class,
-    Message::class,
-    MyData::class],
+    Message::class],
     version = 1,
     exportSchema = false)
 abstract class AppDatabase : RoomDatabase(){
     abstract fun userDao(): UserDao
     abstract fun friendDao(): FriendDao
     abstract fun messageDao(): MessageDao
-    abstract fun myDataDao(): MyDataDao
 
     companion object {
         @Volatile

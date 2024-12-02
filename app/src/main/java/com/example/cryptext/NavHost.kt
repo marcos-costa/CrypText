@@ -1,12 +1,14 @@
 package com.example.cryptext
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.cryptext.data.AppDatabase
+import com.example.cryptext.data.UserDataRepository
 import com.example.cryptext.ui.screen.ConversaPage
 import com.example.cryptext.ui.screen.ConversasPage
 import com.example.cryptext.ui.screen.FriendRequesPage
@@ -17,7 +19,10 @@ import com.example.cryptext.ui.screen.SingUpPage
 import com.example.cryptext.ui.viewmodel.MainViewModel
 
 @Composable
-fun MyApp(database: AppDatabase) {
+fun MyApp(
+    database: AppDatabase,
+    userDataRepository: UserDataRepository
+) {
     val navController = rememberNavController()
 
     NavHost(
@@ -25,7 +30,10 @@ fun MyApp(database: AppDatabase) {
         startDestination = "login/a/a"
     ) {
 
-        val viewModel = MainViewModel(database)
+        val viewModel = MainViewModel(
+            database,
+            userDataRepository
+        )
 
         composable(
             route = "login/{email}/{senha}",
@@ -43,6 +51,7 @@ fun MyApp(database: AppDatabase) {
 
             LoginPage(
                 navController,
+                viewModel,
                 email = email,
                 senha = senha
             )
@@ -93,6 +102,16 @@ fun MyApp(database: AppDatabase) {
             )
         }
 
+        composable(
+            route = "myProfile"
+        ){
+            ProfilePage(
+                navController,
+                viewModel,
+                myProfile = true,
+                username = ""
+            )
+        }
         composable(
             route = "friendProfile/{username}",
             arguments = listOf(

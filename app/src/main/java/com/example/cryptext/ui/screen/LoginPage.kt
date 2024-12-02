@@ -11,35 +11,38 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.cryptext.R
-import com.example.cryptext.SocketHandler
 import com.example.cryptext.ui.components.InputText
 import com.example.cryptext.ui.components.LineSepator
 import com.example.cryptext.ui.components.LoginButton
 import com.example.cryptext.ui.components.LoginHeader
-import com.example.cryptext.ui.theme.CrypTextTheme
+import com.example.cryptext.ui.viewmodel.MainViewModel
 
 @Composable
 fun LoginPage(
     navController: NavHostController,
+    viewModel: MainViewModel,
     email: String,
     senha: String
 ) {
     
     var email by remember { mutableStateOf(email)}
     var senha by remember { mutableStateOf(senha)}
-    val socket = SocketHandler.getSocket()
+
+    val isLogged = viewModel.isLogged.collectAsState(initial = false)
+
+    if (isLogged.value){
+        navController.navigate("conversas")
+    }
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -88,7 +91,7 @@ fun LoginPage(
         )
         LoginButton(
             text = "Confirmar",
-            onClick = {navController.navigate("conversas")},
+            onClick = { viewModel.login(email, senha)},
             modifier = Modifier.padding(top = 15.dp)
         )
         Row (

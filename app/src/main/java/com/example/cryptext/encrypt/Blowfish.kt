@@ -1,11 +1,11 @@
-package com.example.cryptext
+package com.example.cryptext.encrypt
 
 import java.math.BigInteger
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
 
-fun encryptBlowfish(key: BigInteger, message: String): String {
+fun encryptBlowfish(key: String, message: String): String {
 
     val keyBytes = key.toByteArray()
     val secretKey = SecretKeySpec(keyBytes, "Blowfish")
@@ -17,7 +17,7 @@ fun encryptBlowfish(key: BigInteger, message: String): String {
     return java.util.Base64.getEncoder().encodeToString(encryptedBytes)
 }
 
-fun decryptBlowfish(key: BigInteger, encryptedMessage: String): String {
+fun decryptBlowfish(key: String, encryptedMessage: String): String {
 
     val keyBytes = key.toByteArray()
     val secretKey = SecretKeySpec(keyBytes, "Blowfish")
@@ -31,8 +31,8 @@ fun decryptBlowfish(key: BigInteger, encryptedMessage: String): String {
 }
 
 fun main() {
-    val key = BigInteger("9")
-    val message = "Esta é uma mensagem secreta!"
+    val key = "12345"
+    val message = "Esta e uma mensagem secreta!"
 
     val encryptedMessage = encryptBlowfish(key, message)
     println("Mensagem criptografada: $encryptedMessage")

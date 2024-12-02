@@ -34,7 +34,7 @@ fun ConversasPage(
                 friendRequests = friendsSolicitations.value,
                 onClickConversas = { navHostController.navigate("conversas") },
                 onClickFriends = { navHostController.navigate("friends") },
-                onClickProfile = { navHostController.navigate("profile/true/") },
+                onClickProfile = { navHostController.navigate("myProfile") },
                 modifier = Modifier.fillMaxWidth()
             )
         },

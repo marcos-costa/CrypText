@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +36,12 @@ fun SingUpPage(
     var username by remember { mutableStateOf("")}
     var email by remember { mutableStateOf("") }
     var senha by remember { mutableStateOf("") }
+
+    val isRegistrated = viewModel.isRegistrated.collectAsState(initial = false)
+
+    if (isRegistrated.value) {
+        navController.navigate("login/$email/$senha")
+    }
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -98,7 +105,6 @@ fun SingUpPage(
                     username = username,
                     password = senha
                 )
-                navController.navigate("login/$email/$senha")
             }
         )
     }
