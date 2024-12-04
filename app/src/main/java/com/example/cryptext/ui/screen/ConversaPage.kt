@@ -29,7 +29,7 @@ fun ConversaPage(
     viewModel.getFriend(username)
     viewModel.getFriendMessage(username)
 
-    val friend = viewModel.friend.collectAsState(initial = Friend(id = "0",name = "Desconhecido", email = "none", username = "@none", sharedKey = "none", ))
+    val friend = viewModel.friend.collectAsState(initial = Friend(name = "Desconhecido", email = "none", username = "@none", sharedKey = "none", ))
     val messages = viewModel.friendMessages.collectAsState(initial = emptyList())
 
     var text by remember { mutableStateOf("") }

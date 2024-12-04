@@ -26,10 +26,12 @@ fun FriendRequesPage(
     navHostController: NavHostController,
     viewModel: MainViewModel
 ) {
+    viewModel.listUsers()
+
     var unreadMessages = viewModel.unreadMessagesCount.collectAsState(initial = 0)
     var friendsSolicitations = viewModel.pendingSolicitationsCount.collectAsState(initial = 0)
 
-    var friendSolicitations = viewModel.friendSolicitations.collectAsState(initial = emptyList())
+    var usersList = viewModel.usersList.collectAsState(initial = emptyList())
 
     var value by remember { mutableStateOf("") }
     Scaffold (
@@ -58,7 +60,8 @@ fun FriendRequesPage(
         },
         content = { paddingValues ->
             SendFriendRequestItemList(
-                users = friendSolicitations.value,
+                users = usersList.value,
+                onClick = { viewModel.requestFriend(it) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(paddingValues)

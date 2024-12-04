@@ -1,6 +1,5 @@
 package com.example.cryptext.data
 
-import android.graphics.Bitmap
 import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -10,7 +9,9 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.math.BigInteger
 
@@ -19,10 +20,10 @@ class UserDataRepository(
 ) {
     private companion object{
         val PRIVATE_KEY = intPreferencesKey("privateKey")
-        val NAME = stringPreferencesKey("")
-        val USERNAME = stringPreferencesKey("")
-        val EMAIL = stringPreferencesKey("")
-        val PASSWORD = stringPreferencesKey("")
+        val NAME = stringPreferencesKey("name")
+        val USERNAME = stringPreferencesKey("username")
+        val EMAIL = stringPreferencesKey("email")
+        val PASSWORD = stringPreferencesKey("password")
         val TAG = "UserDataRepository"
     }
 
@@ -50,10 +51,10 @@ class UserDataRepository(
         }
         .map { preferences ->
             mapOf(
-                "name" to preferences[NAME],
-                "username" to preferences[USERNAME],
-                "email" to preferences[EMAIL],
-                "password" to preferences[PASSWORD]
+                "name" to (preferences[NAME] ?: ""),
+                "username" to (preferences[USERNAME] ?: ""),
+                "email" to (preferences[EMAIL] ?: ""),
+                "password" to (preferences[PASSWORD] ?: "")
             )
         }
 
@@ -63,12 +64,15 @@ class UserDataRepository(
         }
     }
 
-    suspend fun saveUserData(name: String, username: String, email: String, password: String) {
-        dataStore.edit { preferences ->
-            preferences[NAME] = name
-            preferences[USERNAME] = username
-            preferences[EMAIL] = email
-            preferences[PASSWORD] = password
+    fun saveUserData(name: String, username: String, email: String, password: String) {
+        Log.d("User_Data", "New user data -> name: $name, username: $username, email: $email, password: $password")
+        runBlocking {
+            dataStore.edit { preferences ->
+                preferences[NAME] = name
+                preferences[USERNAME] = username
+                preferences[EMAIL] = email
+                preferences[PASSWORD] = password
+            }
         }
     }
 }

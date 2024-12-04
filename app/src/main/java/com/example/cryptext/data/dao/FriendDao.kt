@@ -26,7 +26,10 @@ interface FriendDao {
     fun delete(friend: Friend)
 
     @Query("SELECT * FROM friend WHERE username = :name")
-    fun getFriend(name: String): Flow<Friend>
+    fun getFriend(name: String): Friend
+
+    @Query("SELECT * FROM friend WHERE username = :name")
+    fun getFriendFlow(name: String): Flow<Friend>
 
     @Query("SELECT * FROM friend")
     fun getAllFriend(): Flow<List<Friend>>

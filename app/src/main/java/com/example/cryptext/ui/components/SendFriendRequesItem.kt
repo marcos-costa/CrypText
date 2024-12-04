@@ -68,6 +68,7 @@ fun SendFriendRequestItem(
                     disabledContainerColor = Color(0xFFD7D7D7),
                     disabledContentColor = Color(0xFF736B6B),
                 ),
+                enabled = user.p == null,
                 onClick = onClick
             ) {
                 Text(

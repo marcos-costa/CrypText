@@ -3,23 +3,25 @@ package com.example.cryptext.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.cryptext.backendIntegration.SocketHandler
 import com.example.cryptext.data.AppDatabase
+import com.example.cryptext.data.ServerSharedKey
 import com.example.cryptext.data.UserDataRepository
 import com.example.cryptext.data.entity.Friend
 import com.example.cryptext.data.entity.Message
 import com.example.cryptext.data.entity.User
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import java.time.Instant
-import com.example.cryptext.backendIntegration.SocketHandler
-import com.example.cryptext.data.ServerSharedKey
+import com.example.cryptext.encrypt.DiffieHellman
+import com.example.cryptext.encrypt.decryptBlowfish
 import com.example.cryptext.encrypt.encryptBlowfish
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.math.BigInteger
 import java.security.SecureRandom
+import java.time.Instant
 
 
 class MainViewModel(
@@ -30,31 +32,29 @@ class MainViewModel(
     private var TAG = "CrypText - ViewModel"
 
     lateinit var privateKey: BigInteger
+    var myData: Flow<Map<String, String>>
 
     init {
+        myData = userDataRepository.userData
         viewModelScope.launch {
             privateKey = userDataRepository.privateKey.first().toBigInteger()
             if (privateKey == BigInteger("0")){
                 privateKey = BigInteger.probablePrime(16, SecureRandom())
                 userDataRepository.savePrivateKey(privateKey)
             }
-
-            SocketHandler.connect("http://192.168.1.26:3000")
-            SocketHandler.diffieHellmanKeyExchange(privateKey)
+            SocketHandler.connect("http://3.137.189.73:3000/", privateKey, database )
         }
     }
 
     val friends: Flow<List<Friend>> = database.friendDao().getAllFriend()
     val friendsRequest: Flow<List<User>> = database.userDao().getAllReceivedSolicitations()
 
-    val friendSolicitations: Flow<List<User>> = database.userDao().getAllPendingSolicitations()
+    val usersList: Flow<List<User>> = database.userDao().getAllUsers()
 
     val unreadMessagesCount: Flow<Int> = database.messageDao().getUnreadMessagesCount()
     val pendingSolicitationsCount: Flow<Int> = database.userDao().getPendingSolicitatinonsCount()
 
     val lastChat: Flow<List<Message>> = database.messageDao().getLastMessages()
-
-    var myData = userDataRepository.userData
 
     var isRegistrated = MutableStateFlow(false)
     var isLogged = MutableStateFlow(false)
@@ -63,16 +63,38 @@ class MainViewModel(
     lateinit var friend: Flow<Friend>
     lateinit var  friendMessages: Flow<List<Message>>
 
+
+
     fun sendMessage(content: String, friend: String) {
-        val message = Message(
-            friend = friend,
-            timestamp = Instant.now().toEpochMilli(),
-            received = false,
-            read = true,
-            content = content
-        )
         viewModelScope.launch(Dispatchers.IO) {
-            database.messageDao().insert(message)
+            Log.d(TAG, "Enviando mensagem ao servidor")
+
+            var sender = myData.first()["username"] ?: ""
+            var receiver = friend
+            val timestamp = Instant.now().toEpochMilli().toString()
+
+            Log.d(TAG, "Dados da requisição -> sender: $sender, receiver: $receiver, timestamp: $timestamp, content: $content")
+
+            sender = encryptBlowfish(ServerSharedKey.value, sender)
+            receiver = encryptBlowfish(ServerSharedKey.value, receiver)
+            val encryptedTimestamp = encryptBlowfish(ServerSharedKey.value, timestamp)
+
+            val sharedKey = database.friendDao().getFriend(friend).sharedKey
+            val encryptedContent = encryptBlowfish(sharedKey, content)
+
+            Log.d(TAG, "Dados criptografados da requisição -> sender: $sender, receiver: $receiver, timestamp: $encryptedTimestamp, content: $encryptedContent")
+
+            SocketHandler.sendMessage(sender, receiver, encryptedTimestamp, encryptedContent) {
+                database.messageDao().insert(
+                    Message(
+                        friend = friend,
+                        timestamp = Instant.now().toEpochMilli(),
+                        received = false,
+                        read = true,
+                        content = content
+                    )
+                )
+            }
         }
     }
 
@@ -80,10 +102,10 @@ class MainViewModel(
         Log.d(TAG, "Sending Register user request")
         Log.d(TAG, "User Data -> name: $name, username: $username, email: $email, password: $password")
 
-        val encryptedName = encryptBlowfish(ServerSharedKey.value.toString(), name)
-        val encryptedUsername = encryptBlowfish(ServerSharedKey.value.toString(), username)
-        val encryptedEmail = encryptBlowfish(ServerSharedKey.value.toString(), email)
-        val encryptedPassword = encryptBlowfish(ServerSharedKey.value.toString(), password)
+        val encryptedName = encryptBlowfish(ServerSharedKey.value, name)
+        val encryptedUsername = encryptBlowfish(ServerSharedKey.value, username)
+        val encryptedEmail = encryptBlowfish(ServerSharedKey.value, email)
+        val encryptedPassword = encryptBlowfish(ServerSharedKey.value, password)
 
         Log.d(TAG, "User Data Encrypted -> name: $encryptedName, username: $encryptedUsername, email: $encryptedEmail, password: $encryptedPassword")
 
@@ -93,44 +115,134 @@ class MainViewModel(
     }
 
     fun login(email: String, password: String){
+
         Log.d(TAG, "Sending Login user request")
         Log.d(TAG, "User Data -> email: $email, password: $password")
 
-        val encryptedEmail = encryptBlowfish(ServerSharedKey.value.toString(), email)
-        val encryptedPassword = encryptBlowfish(ServerSharedKey.value.toString(), password)
+        val encryptedEmail = encryptBlowfish(ServerSharedKey.value, email)
+        val encryptedPassword = encryptBlowfish(ServerSharedKey.value, password)
 
         Log.d(TAG, "User Data Encrypted -> email: $encryptedEmail, password: $encryptedPassword")
 
-        SocketHandler.login(encryptedEmail, encryptedPassword) {
-            isLogged.value = it
+        SocketHandler.login(encryptedEmail, encryptedPassword) { logged, name, username ->
+            isLogged.value = logged
+            if (logged) {
+                userDataRepository.saveUserData(
+                    name = name,
+                    username = username,
+                    email = email,
+                    password = password
+                )
+            }
+        }
+    }
+
+    fun listUsers() {
+        viewModelScope.launch {
+            Log.d(TAG, "Requisitando lista de usuários do Servidor")
+            SocketHandler.listUsers(
+                encryptBlowfish(ServerSharedKey.value, myData.first()["username"] ?: "")
+            )
         }
     }
 
 
     fun getFriend(username: String){
-        friend = database.friendDao().getFriend(username)
+        friend = database.friendDao().getFriendFlow(username)
+    }
+
+    fun requestFriend(user: User){
+        viewModelScope.launch {
+            Log.d(TAG, "Enviando requisição de amizade ao servidor")
+
+            var friend1 = myData.first()["username"] ?: ""
+            var friend2 = user.username
+            val (p, g) = DiffieHellman().generatePG()
+            val pString = p.toString()
+            val gString = g.toString()
+            var publicKey = DiffieHellman().calculatePublicKey(p, g, privateKey).toString()
+
+            Log.d(TAG, "Dados da requisição de amizade -> friend1: $friend1, friend2: $friend2, p: $pString, g: $gString, publicKey: $publicKey")
+
+            friend1 = encryptBlowfish(ServerSharedKey.value, friend1)
+            friend2 = encryptBlowfish(ServerSharedKey.value, friend2)
+            val pStringEncrypt = encryptBlowfish(ServerSharedKey.value, pString)
+            val gStringEncrypt = encryptBlowfish(ServerSharedKey.value, gString)
+            publicKey = encryptBlowfish(ServerSharedKey.value, publicKey)
+
+            Log.d(TAG, "Dados da requisição de amaizade -> friend1: $friend1, friend2: $friend2, p: $pString, g: $gString, publicKey: $publicKey")
+
+            SocketHandler.requestFriend(friend1, friend2, pStringEncrypt, gStringEncrypt, publicKey) {
+                database.userDao().delete(user)
+                database.userDao().insert(
+                    User(
+                        name = user.name,
+                        username = user.username,
+                        email = user.email,
+                        p = pString,
+                        g = gString
+                    )
+                )
+            }
+        }
+    }
+
+    fun acceptFriend(user: User) {
+        Log.d(TAG, "Enviando requisição de aceitar amizade ao servidor")
+
+        viewModelScope.launch {
+            var friend1 = user.username
+            var friend2 = myData.first()["username"] ?: ""
+            var publicKey = DiffieHellman().calculatePublicKey(user.p!!.toBigInteger(), user.g!!.toBigInteger(), privateKey).toString()
+
+            Log.d(TAG, "Dados da requisição de aceitar amizade -> friend1: $friend1, friend2: $friend2, publicKey: $publicKey")
+
+            friend1 = encryptBlowfish(ServerSharedKey.value, friend1)
+            friend2 = encryptBlowfish(ServerSharedKey.value, friend2)
+            publicKey = encryptBlowfish(ServerSharedKey.value, publicKey)
+
+            Log.d(TAG, "Dados da requisição de aceitar amizade -> friend1: $friend1, friend2: $friend2, publicKey: $publicKey")
+
+            SocketHandler.acceptFriendRequest(friend1, friend2, publicKey) {
+                val sharedKey = DiffieHellman().calculateSharedSecret(user.p.toBigInteger(), privateKey, user.publicKey!!.toBigInteger())
+                val friend = Friend(
+                    name = user.name,
+                    email = user.email,
+                    username = user.username,
+                    sharedKey = sharedKey.toString()
+                )
+                database.friendDao().insert(friend)
+                database.userDao().delete(user)
+            }
+        }
+    }
+    fun declineFriend(user: User) {
+        Log.d(TAG, "Enviando requisição de rejeitar amizade ao servidor")
+
+        viewModelScope.launch {
+            var friend1 = myData.first()["name"] ?: ""
+            var friend2 = user.username
+
+            Log.d(TAG, "Dados da requisição de rejeitar amizade -> friend1: $friend1, friend2: $friend2")
+
+            friend1 = encryptBlowfish(ServerSharedKey.value, friend1)
+            friend2 = encryptBlowfish(ServerSharedKey.value, friend2)
+
+            Log.d(TAG, "Dados da requisição de aceitar amizade -> friend1: $friend1, friend2: $friend2")
+
+            SocketHandler.declineFriendRequest(friend1, friend2) {
+                database.userDao().insert(
+                    User(
+                        name = user.name,
+                        username = user.username,
+                        email = user.email
+                    )
+                )
+            }
+        }
     }
 
     fun getFriendMessage(username: String){
         friendMessages = database.messageDao().getFriendMessages(username)
-    }
-
-    fun acceptFriend(user: User) {
-        val friend = Friend(
-            id = user.id,
-            name = user.name,
-            email = user.email,
-            username = user.username,
-            sharedKey = "2"
-        )
-        viewModelScope.launch(Dispatchers.IO) {
-            database.friendDao().insert(friend)
-            database.userDao().delete(user)
-        }
-    }
-    fun declineFriend(user: User) {
-        viewModelScope.launch(Dispatchers.IO) {
-            database.userDao().delete(user)
-        }
     }
 }

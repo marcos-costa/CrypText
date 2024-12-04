@@ -44,15 +44,20 @@ fun ProfilePage(
     var email: String = ""
 
     if (!myProfile) {
-        val friend = viewModel.friend.collectAsState(initial = Friend(id = "0",name = "Desconhecido", email = "none", username = "@none", sharedKey = "none", ))
+        val friend = viewModel.friend.collectAsState(initial = Friend(name = "Desconhecido", email = "none", username = "@none", sharedKey = "none", ))
         nome = friend.value.name
         username = friend.value.username
         email = friend.value.email
     } else {
-        val myData = viewModel.myData.collectAsState(initial = MyData(privateKey = 0))
-        nome = myData.value.name ?: ""
-        username = myData.value.username ?: ""
-        email = myData.value.email ?: ""
+        val myData = viewModel.myData.collectAsState(initial = mapOf(
+            "name" to "",
+            "username" to "",
+            "email" to "",
+            "password" to  "")
+        )
+        nome = myData.value["name"] ?: ""
+        username = myData.value["username"] ?: ""
+        email = myData.value["email"] ?: ""
     }
 
 

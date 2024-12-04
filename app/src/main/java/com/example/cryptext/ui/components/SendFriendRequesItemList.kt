@@ -17,6 +17,7 @@ import com.example.cryptext.ui.theme.CrypTextTheme
 @Composable
 fun SendFriendRequestItemList (
     users: List<User>,
+    onClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row (
@@ -27,7 +28,7 @@ fun SendFriendRequestItemList (
                 items(users) { user ->
                     SendFriendRequestItem(
                         user = user,
-                        onClick = {},
+                        onClick = { onClick( user ) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 10.dp)
@@ -36,7 +37,7 @@ fun SendFriendRequestItemList (
             } else {
                 item {
                     Text (
-                        text = "Nenhuma solicitação pendente",
+                        text = "Nenhum usuário encontrado",
                         style = MaterialTheme.typography.bodyLarge
                         )
                 }
