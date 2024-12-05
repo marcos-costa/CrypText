@@ -67,5 +67,5 @@ dependencies {
     implementation(libs.socket.io.client) {
         exclude(group = "org.json", module = "json")
     }
-
+    implementation("com.auth0:java-jwt:3.18.2")
 }
