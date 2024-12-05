@@ -45,7 +45,7 @@ class MainViewModel(
                 privateKey = BigInteger.probablePrime(16, SecureRandom())
                 userDataRepository.savePrivateKey(privateKey)
             }
-            SocketHandler.connect("http://3.137.189.73:3000/", privateKey, database )
+            SocketHandler.connect("http://192.168.1.62:3000/", privateKey, database )
         }
     }
 

@@ -8,6 +8,8 @@ import com.example.cryptext.data.entity.Message
 import com.example.cryptext.data.entity.User
 import com.example.cryptext.encrypt.DiffieHellman
 import com.example.cryptext.encrypt.decryptBlowfish
+import com.example.cryptext.encrypt.encryptBlowfish
+import com.example.cryptext.encrypt.tokenJWT
 import io.socket.client.IO
 import io.socket.client.Socket
 import kotlinx.coroutines.flow.first
@@ -198,11 +200,31 @@ object SocketHandler {
                     Log.d(TAG, "Shared server key: $sharedServerKey")
 
                     ServerSharedKey.value = sharedServerKey.toString()
+                    authenticate()
                 } else {
                     Log.d(TAG, "Fail Diffie-Hellman.")
                 }
             } else {
                 Log.d(TAG, "No value in server response")
+            }
+        }
+    }
+
+    fun authenticate() {
+        val token = tokenJWT().generateToken()
+        Log.d(TAG, "Token JWT descriptografado ${token}")
+        val tokenEncrypted = encryptBlowfish(ServerSharedKey.value, token)
+        Log.d(TAG, "Token JWT criptografado ${tokenEncrypted}")
+        socket.emit("token-jwt", arrayOf(tokenEncrypted)) { response ->
+            if (response.isNotEmpty()) {
+                val jsonResponse = response[0] as JSONObject
+                if (jsonResponse.getBoolean("success")) {
+                    Log.d(TAG, "Token JWT válido e aceito")
+                } else {
+                    Log.d(TAG, "Falha ao validar Token JWT")
+                }
+            } else {
+                Log.d(TAG, "Nenhuma resposta recebida do servidor.")
             }
         }
     }
