@@ -11,14 +11,11 @@ import com.example.cryptext.data.entity.Friend
 import com.example.cryptext.data.entity.Message
 import com.example.cryptext.data.entity.User
 import com.example.cryptext.encrypt.DiffieHellman
-import com.example.cryptext.encrypt.decryptBlowfish
 import com.example.cryptext.encrypt.encryptBlowfish
+import com.example.cryptext.encrypt.hashSenhaSHA256
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -121,13 +118,15 @@ class MainViewModel(
     }
 
     fun singUp(name: String, username: String, email: String, password: String){
+        val hashPassword = hashSenhaSHA256(password)
+
         Log.d(TAG, "Sending Register user request")
-        Log.d(TAG, "User Data -> name: $name, username: $username, email: $email, password: $password")
+        Log.d(TAG, "User Data -> name: $name, username: $username, email: $email, password: $hashPassword")
 
         val encryptedName = encryptBlowfish(ServerSharedKey.value, name)
         val encryptedUsername = encryptBlowfish(ServerSharedKey.value, username)
         val encryptedEmail = encryptBlowfish(ServerSharedKey.value, email)
-        val encryptedPassword = encryptBlowfish(ServerSharedKey.value, password)
+        val encryptedPassword = encryptBlowfish(ServerSharedKey.value, hashPassword)
 
         Log.d(TAG, "User Data Encrypted -> name: $encryptedName, username: $encryptedUsername, email: $encryptedEmail, password: $encryptedPassword")
 
@@ -138,11 +137,13 @@ class MainViewModel(
 
     fun login(email: String, password: String){
 
+        val hashPassword = hashSenhaSHA256(password)
+
         Log.d(TAG, "Sending Login user request")
-        Log.d(TAG, "User Data -> email: $email, password: $password")
+        Log.d(TAG, "User Data -> email: $email, password: $hashPassword")
 
         val encryptedEmail = encryptBlowfish(ServerSharedKey.value, email)
-        val encryptedPassword = encryptBlowfish(ServerSharedKey.value, password)
+        val encryptedPassword = encryptBlowfish(ServerSharedKey.value, hashPassword)
 
         Log.d(TAG, "User Data Encrypted -> email: $encryptedEmail, password: $encryptedPassword")
 
