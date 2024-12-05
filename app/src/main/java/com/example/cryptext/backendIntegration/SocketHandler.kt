@@ -18,11 +18,13 @@ object SocketHandler {
 
     private var TAG = "Backend Integration"
 
-    lateinit private var socket: Socket
-    lateinit var database: AppDatabase
+    private lateinit var socket: Socket
+    private lateinit var database: AppDatabase
+    private lateinit var private_Key: BigInteger
 
     fun connect(serverUrl: String, privateKey: BigInteger, appDatabase: AppDatabase) {
         database = appDatabase
+        private_Key = privateKey
 
         socket = IO.socket(serverUrl)
         socket.connect()
@@ -364,12 +366,149 @@ object SocketHandler {
         socket.emit("online-loged", arrayOf(encryptedUsername)) { response ->
             if (response.isNotEmpty()) {
                 val jsonResponse = response[0] as JSONObject
-                Log.d(TAG, jsonResponse.toString())
                 if (jsonResponse.getBoolean("success")) {
                     Log.d(TAG, "Sucesso ao obter dados recebidos enquanto offline")
+
                     val offlineReceivedMessages = jsonResponse.getJSONArray("offlineReceivedMessages")
+                    if (offlineReceivedMessages.length() > 0) {
+                        Log.d(TAG, "Mensagens enviadas enquanto o usuário estava offline")
+                        for (i in 0 ..<offlineReceivedMessages.length()){
+                            val receivedMessage = offlineReceivedMessages.getJSONObject(i)
+
+                            var username = receivedMessage.getString("friend1")
+                            var timestamp = receivedMessage.getString("datetime")
+                            var content = receivedMessage.getString("content")
+
+                            Log.d(TAG, "Dados criptografados recebidos do servidor -> sender: $username, timestamp: $timestamp, conent: $content")
+
+                            username = decryptBlowfish(ServerSharedKey.value, username)
+                            timestamp = decryptBlowfish(ServerSharedKey.value, timestamp)
+
+                            val sharedKey = database.friendDao().getFriend(username).sharedKey
+                            content = decryptBlowfish(sharedKey, content)
+
+                            Log.d(TAG, "Dados descriptografados recebidos do servidor -> sender: $username, timestamp: $timestamp, conent: $content")
+
+                            database.messageDao().insert(
+                                Message(
+                                    friend = username,
+                                    timestamp = timestamp.toLong(),
+                                    received = true,
+                                    read = false,
+                                    content = content
+                                )
+                            )
+
+                            Log.d(TAG, "Mensagem salva com sucesso")
+                        }
+                    } else {
+                        Log.d(TAG, "Nenhuma mensagem enviadas enquanto o usuário estava offline")
+                    }
+
                     val offlineFriendRequests = jsonResponse.getJSONArray("offlineFriendRequests")
+                    if (offlineFriendRequests.length() > 0) {
+                        Log.d(TAG, "Solicitações de amizade enviadas enquanto o usuário estava offline")
+                        for (i in 0 ..<offlineFriendRequests.length()){
+                            val friendRequest = offlineFriendRequests.getJSONObject(i)
+
+                            var username = friendRequest.getString("friend1")
+                            var name = friendRequest.getString("name")
+                            var email = friendRequest.getString("email")
+                            var p = friendRequest.getString("p_value")
+                            var g = friendRequest.getString("g_value")
+                            var publicKey = friendRequest.getString("publickey_friend1")
+
+                            Log.d(TAG, "Dados criptografados recebidos do servidor -> sender: $username, name: $name, email: $email, p_value: $p, g_value: $g, publicKey: $publicKey")
+
+                            username = decryptBlowfish(ServerSharedKey.value, username)
+                            name = decryptBlowfish(ServerSharedKey.value, name)
+                            email = decryptBlowfish(ServerSharedKey.value, email)
+                            p = decryptBlowfish(ServerSharedKey.value, p)
+                            g = decryptBlowfish(ServerSharedKey.value, g)
+                            publicKey = decryptBlowfish(ServerSharedKey.value, publicKey)
+
+                            Log.d(TAG, "Dados criptografados recebidos do servidor -> sender: $username, name: $name, email: $email, p_value: $p, g_value: $g, publicKey: $publicKey")
+
+                            database.userDao().insert(
+                                User(
+                                    name = name,
+                                    username = name,
+                                    email = email,
+                                    p = p,
+                                    g = g,
+                                    publicKey = publicKey
+                                )
+                            )
+
+                            Log.d(TAG, "Solicitação de amizade adicionada com sucesso")
+                        }
+                    } else {
+                        Log.d(TAG, "Nenhuma solicitação de amizade enviadas enquanto o usuário estava offline")
+                    }
+
                     val offlineAcceptedRequests = jsonResponse.getJSONArray("offlineAcceptedRequests")
+                    if (offlineAcceptedRequests.length() > 0) {
+                        Log.d(TAG, "Solicitações de amizade aceitas enquanto o usuário estava offline")
+                        for (i in 0 ..<offlineAcceptedRequests.length()){
+                            val acceptedRequest = offlineAcceptedRequests.getJSONObject(i)
+
+                            var friend = acceptedRequest.getString("friend2")
+                            var publicKey = acceptedRequest.getString("publicKey_friend2")
+
+                            Log.d(TAG, "Dados criptografados recebidos do servidor -> friendUsername: $friend, friendPublickey: $publicKey")
+
+                            friend = decryptBlowfish(ServerSharedKey.value, friend)
+                            publicKey = decryptBlowfish(ServerSharedKey.value, publicKey)
+
+                            Log.d(TAG, "Dados descriptografados recebidos do servidor -> friendUsername: $friend, friendPublickey: $publicKey")
+
+                            val user = database.userDao().getUser(friend)
+
+                            val sharedKey = DiffieHellman().calculateSharedSecret(user.p!!.toBigInteger(), private_Key, publicKey.toBigInteger())
+
+                            val newFriend = Friend(
+                                name = user.name,
+                                username = user.username,
+                                email = user.email,
+                                sharedKey = sharedKey.toString()
+                            )
+
+                            database.friendDao().insert(newFriend)
+                            database.userDao().delete(user)
+
+                            Log.d(TAG, "Usuário adicionado aos amigos com sucesso")
+                        }
+                    } else {
+                        Log.d(TAG, "Nenhuma solicitação de amizade recusada enviadas enquanto o usuário estava offline")
+                    }
+
+                    val offlineRefusedRequests = jsonResponse.getJSONArray("offlineRefusedRequests")
+                    if (offlineRefusedRequests.length() > 0) {
+                        Log.d(TAG, "Solicitações de amizade recusadas enquanto o usuário estava offline")
+                        for (i in 0 ..<offlineRefusedRequests.length()){
+                            val refusedRequest = offlineRefusedRequests.getJSONObject(i)
+
+                            var friend = refusedRequest.getString("friend2")
+
+                            Log.d(TAG, "Dados criptografados recebidos do servidor -> friendUsername: $friend")
+
+                            friend = decryptBlowfish(ServerSharedKey.value, friend)
+
+                            Log.d(TAG, "Dados descriptografados recebidos do servidor -> friendUsername: $friend")
+
+                            val user = database.userDao().getUser(friend)
+
+                            val newUser = User(
+                                name = user.name,
+                                username = user.username,
+                                email = user.email,
+                            )
+
+                            database.userDao().insert(newUser)
+                        }
+                    } else {
+                        Log.d(TAG, "Nenhuma solicitação de amizade recusada enviadas enquanto o usuário estava offline")
+                    }
 
                 } else {
                     Log.d(TAG, "Falha ao obter dados recebidos enquanto offline")

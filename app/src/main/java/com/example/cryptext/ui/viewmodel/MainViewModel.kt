@@ -16,8 +16,11 @@ import com.example.cryptext.encrypt.encryptBlowfish
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.math.BigInteger
 import java.security.SecureRandom
@@ -59,11 +62,30 @@ class MainViewModel(
     var isRegistrated = MutableStateFlow(false)
     var isLogged = MutableStateFlow(false)
 
-
     lateinit var friend: Flow<Friend>
     lateinit var  friendMessages: Flow<List<Message>>
 
+    fun getFriendMessage(username: String){
+        friendMessages = database.messageDao().getFriendMessages(username)
+    }
 
+    fun getFriend(username: String){
+        friend = database.friendDao().getFriendFlow(username)
+    }
+
+    fun readFriendMessages(username: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            var messages = database.messageDao()
+                .getFriendMessages(username)
+                .map { entities ->
+                    entities.map { entity ->
+                        entity.copy(read = true)
+                    }
+                }.collect{ list ->
+                    database.messageDao().updateAll(list)
+                }
+        }
+    }
 
     fun sendMessage(content: String, friend: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -133,6 +155,16 @@ class MainViewModel(
                     email = email,
                     password = password
                 )
+
+                Log.d(TAG, "Obtendo os dados enviados quando o usuário estava offline")
+
+                Log.d(TAG, "Dados enviados na requisição -> username: $username")
+
+                val encryptedUsername = encryptBlowfish(ServerSharedKey.value, username)
+
+                Log.d(TAG, "Dados criptografados enviados na requisição -> username: $encryptedUsername")
+
+                SocketHandler.getOfflineData(encryptedUsername)
             }
         }
     }
@@ -144,11 +176,6 @@ class MainViewModel(
                 encryptBlowfish(ServerSharedKey.value, myData.first()["username"] ?: "")
             )
         }
-    }
-
-
-    fun getFriend(username: String){
-        friend = database.friendDao().getFriendFlow(username)
     }
 
     fun requestFriend(user: User){
@@ -240,9 +267,5 @@ class MainViewModel(
                 )
             }
         }
-    }
-
-    fun getFriendMessage(username: String){
-        friendMessages = database.messageDao().getFriendMessages(username)
     }
 }
