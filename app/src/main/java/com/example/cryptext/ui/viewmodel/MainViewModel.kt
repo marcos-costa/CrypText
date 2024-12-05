@@ -247,8 +247,8 @@ class MainViewModel(
         Log.d(TAG, "Enviando requisição de rejeitar amizade ao servidor")
 
         viewModelScope.launch {
-            var friend1 = myData.first()["name"] ?: ""
-            var friend2 = user.username
+            var friend1 = user.username
+            var friend2 = myData.first()["username"] ?: ""
 
             Log.d(TAG, "Dados da requisição de rejeitar amizade -> friend1: $friend1, friend2: $friend2")
 

@@ -330,7 +330,7 @@ object SocketHandler {
     }
 
     fun declineFriendRequest(encryptedFriend1: String, encryptedFriend2: String, onSucess: () -> Unit){
-        socket.emit("accept-friend", arrayOf(encryptedFriend1, encryptedFriend2)) { response ->
+        socket.emit("reject-friend", arrayOf(encryptedFriend1, encryptedFriend2)) { response ->
             if (response.isNotEmpty()) {
                 val jsonResponse = response[0] as JSONObject
                 if (jsonResponse.getBoolean("success")) {
@@ -432,7 +432,7 @@ object SocketHandler {
                             database.userDao().insert(
                                 User(
                                     name = name,
-                                    username = name,
+                                    username = username,
                                     email = email,
                                     p = p,
                                     g = g,
@@ -453,7 +453,7 @@ object SocketHandler {
                             val acceptedRequest = offlineAcceptedRequests.getJSONObject(i)
 
                             var friend = acceptedRequest.getString("friend2")
-                            var publicKey = acceptedRequest.getString("publicKey_friend2")
+                            var publicKey = acceptedRequest.getString("publickey_friend2")
 
                             Log.d(TAG, "Dados criptografados recebidos do servidor -> friendUsername: $friend, friendPublickey: $publicKey")
 
