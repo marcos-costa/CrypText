@@ -7,12 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.cryptext.backendIntegration.SocketHandler
 import com.example.cryptext.data.AppDatabase
 import com.example.cryptext.data.UserDataRepository
 import com.example.cryptext.ui.theme.CrypTextTheme
-import java.math.BigInteger
-import java.security.SecureRandom
 
 private const val USER_DATA_NAME = "user_data"
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
@@ -37,11 +34,6 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        SocketHandler.disconnect()
     }
 }
 
